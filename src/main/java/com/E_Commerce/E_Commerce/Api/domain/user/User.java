@@ -1,7 +1,10 @@
 package com.E_Commerce.E_Commerce.Api.domain.user;
 
+import com.E_Commerce.E_Commerce.Api.domain.order.Order;
 import com.E_Commerce.E_Commerce.Api.domain.user.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,10 +34,18 @@ public class User implements UserDetails {
 
     private String password;
 
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> orders;
+
+    public User(@NotBlank String name, @NotBlank String email, String encryptedPassword, @NotNull Role role) {
+        this.name = name;
+        this.email = email;
+        this.password = encryptedPassword;
+        this.role = role;
+    }
 
 
     @Override

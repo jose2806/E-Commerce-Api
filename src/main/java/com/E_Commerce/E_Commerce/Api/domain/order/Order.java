@@ -1,9 +1,9 @@
 package com.E_Commerce.E_Commerce.Api.domain.order;
 
-import com.E_Commerce.E_Commerce.Api.domain.cart.Cart;
-import com.E_Commerce.E_Commerce.Api.domain.user.Role;
+import com.E_Commerce.E_Commerce.Api.domain.cartItem.CartItem;
 import com.E_Commerce.E_Commerce.Api.domain.user.User;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -28,7 +28,7 @@ public class Order {
     private User user;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Cart> items;
+    private List<CartItem> items;
 
     private double total;
 
@@ -37,4 +37,17 @@ public class Order {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+
+    public Order(User user, List<CartItem> cartItems, Double total, @Valid OrderRegisterData data) {
+        this.user = user;
+        this.items = cartItems;
+        this.total = total;
+        this.status = data.status();
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt =LocalDateTime.now();
+    }
+
+
 }
+

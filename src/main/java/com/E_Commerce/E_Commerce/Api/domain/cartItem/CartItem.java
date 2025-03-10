@@ -1,4 +1,4 @@
-package com.E_Commerce.E_Commerce.Api.domain.cart;
+package com.E_Commerce.E_Commerce.Api.domain.cartItem;
 
 import com.E_Commerce.E_Commerce.Api.domain.product.Product;
 import com.E_Commerce.E_Commerce.Api.domain.user.User;
@@ -10,13 +10,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "Cart")
+@Entity(name = "CartItem")
 @Table(name = "cart_items")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Cart {
+public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,16 +31,16 @@ public class Cart {
 
     private int quantity;
 
-    public Cart(User user, Product product, @NotNull int quantity) {
+    public CartItem(User user, Product product, @NotNull int quantity) {
         this.user = user;
         this.product = product;
         this.quantity = quantity;
     }
 
 
-    public void update(User user, Product product, @Valid cartItemUpdateData data) {
+    public void update(User user, Product product, int quantity) {
         this.user = user;
         this.product = product;
-        this.quantity = data.quantity();
+        this.quantity = quantity;
     }
 }

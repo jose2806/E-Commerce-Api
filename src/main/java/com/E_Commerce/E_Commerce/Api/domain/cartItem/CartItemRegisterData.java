@@ -1,6 +1,5 @@
-package com.E_Commerce.E_Commerce.Api.domain.cart;
+package com.E_Commerce.E_Commerce.Api.domain.cartItem;
 
-import com.E_Commerce.E_Commerce.Api.domain.user.User;
 import jakarta.validation.constraints.NotNull;
 
 public record CartItemRegisterData(

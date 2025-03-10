@@ -1,6 +1,6 @@
 package com.E_Commerce.E_Commerce.Api.controller;
 
-import com.E_Commerce.E_Commerce.Api.domain.cart.*;
+import com.E_Commerce.E_Commerce.Api.domain.cartItem.*;
 import com.E_Commerce.E_Commerce.Api.domain.product.Product;
 import com.E_Commerce.E_Commerce.Api.domain.product.ProductRepository;
 import com.E_Commerce.E_Commerce.Api.domain.user.User;
@@ -15,13 +15,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/cart")
-public class CartController {
+public class CartItemController {
     @Autowired
-    private CartRepository cartRepository;
+    private CartItemRepository cartItemRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -35,25 +36,33 @@ public class CartController {
                 .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado"));
         User user = userRepository.findById(data.userId())
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
-        Cart cartItem = new Cart(user, product, data.quantity());
-        Cart cartItemNew = cartRepository.save(cartItem);
-        CartItemResponseData response = new CartItemResponseData(cartItemNew.getId(), cartItemNew.getUser().getId(), cartItemNew.getUser().getName(), cartItemNew.getUser().getEmail(),
-                cartItemNew.getProduct().getId(), cartItemNew.getProduct().getName(), cartItemNew.getProduct().getDescription(), cartItemNew.getProduct().getPrice() ,cartItemNew.getQuantity());
+        Optional<CartItem> existingCartItem = cartItemRepository.findByUserIdAndProductId(user.getId(), product.getId());
+        CartItem cartItem;
+        if (existingCartItem.isPresent()){
+            cartItem = existingCartItem.get();
+            cartItem.update(cartItem.getUser(),cartItem.getProduct(),(cartItem.getQuantity() + data.quantity()));
+            cartItemRepository.save(cartItem);
+        } else {
+            cartItem = new CartItem(user,product,data.quantity());
+            cartItemRepository.save(cartItem);
+        }
+        CartItemResponseData response = new CartItemResponseData(cartItem.getId(), cartItem.getUser().getId(), cartItem.getUser().getName(), cartItem.getUser().getEmail(),
+                cartItem.getProduct().getId(), cartItem.getProduct().getName(), cartItem.getProduct().getDescription(), cartItem.getProduct().getPrice() ,cartItem.getQuantity());
 
-        URI url = uriComponentsBuilder.path("/cart/{id}").buildAndExpand(cartItemNew.getId()).toUri();
+        URI url = uriComponentsBuilder.path("/cart/{id}").buildAndExpand(cartItem.getId()).toUri();
         return ResponseEntity.created(url).body(response);
     }
 
     @GetMapping
     public ResponseEntity<List<CartItemListData>> cartItemsList(){
-       return ResponseEntity.ok(cartRepository.findAll().stream()
+       return ResponseEntity.ok(cartItemRepository.findAll().stream()
                .map(CartItemListData::new).collect(Collectors.toList()));
     }
 
     @GetMapping("/{id}")
     @Transactional
     public ResponseEntity<CartItemResponseData> getCartItem(@PathVariable Long id){
-        Cart cartItem = cartRepository.findById(id)
+        CartItem cartItem = cartItemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item no encontrado"));
         var cartItemData = new CartItemResponseData(cartItem.getId(), cartItem.getUser().getId(), cartItem.getUser().getName(), cartItem.getUser().getEmail(),
                 cartItem.getProduct().getId(), cartItem.getProduct().getName(), cartItem.getProduct().getDescription(), cartItem.getProduct().getPrice() ,cartItem.getQuantity());
@@ -62,14 +71,14 @@ public class CartController {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<CartItemResponseData> updateCartItem(@PathVariable Long id ,@RequestBody @Valid cartItemUpdateData data){
-        Cart cartItem = cartRepository.findById(id)
+    public ResponseEntity<CartItemResponseData> updateCartItem(@PathVariable Long id ,@RequestBody @Valid CartItemUpdateData data){
+        CartItem cartItem = cartItemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item no encontrado"));
         Product product = productRepository.findById(data.productId())
                 .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado"));
         User user = userRepository.findById(data.userId())
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
-        cartItem.update(user, product, data);
+        cartItem.update(user, product, data.quantity());
         return ResponseEntity.ok(new CartItemResponseData(cartItem.getId(), cartItem.getUser().getId(), cartItem.getUser().getName(), cartItem.getUser().getEmail(),
                 cartItem.getProduct().getId(), cartItem.getProduct().getName(), cartItem.getProduct().getDescription(), cartItem.getProduct().getPrice() ,cartItem.getQuantity()));
     }
@@ -77,9 +86,9 @@ public class CartController {
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity deleteCartItem(@PathVariable Long id){
-        Cart cartItem = cartRepository.findById(id)
+        CartItem cartItem = cartItemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item no encontrado"));
-        cartRepository.delete(cartItem);
+        cartItemRepository.delete(cartItem);
         return ResponseEntity.noContent().build();
     }
 }

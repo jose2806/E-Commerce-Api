@@ -8,8 +8,6 @@ public record OrderRegisterData(
         @NotNull
         Long userId,
         @NotNull
-        List<Long> cartItemsId,
-        @NotNull
-        Status status
+        List<Long> cartItemsId
 ) {
 }

@@ -3,7 +3,6 @@ package com.E_Commerce.E_Commerce.Api.domain.order;
 import com.E_Commerce.E_Commerce.Api.domain.cartItem.CartItem;
 import com.E_Commerce.E_Commerce.Api.domain.user.User;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,22 +31,29 @@ public class Order {
 
     private double total;
 
-    private Status status;
+    private StatusOrder statusOrder;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
 
-    public Order(User user, List<CartItem> cartItems, Double total, @Valid OrderRegisterData data) {
+    public Order(User user, List<CartItem> cartItems, Double total) {
         this.user = user;
         this.items = cartItems;
         this.total = total;
-        this.status = data.status();
+        this.statusOrder = StatusOrder.PENDING;
         this.createdAt = LocalDateTime.now();
         this.updatedAt =LocalDateTime.now();
     }
 
 
+    public void update(User user, List<CartItem> cartItems, Double total, StatusOrder statusOrder) {
+        this.user = user;
+        this.items = cartItems;
+        this.statusOrder = statusOrder;
+        this.total = total;
+        this.updatedAt = LocalDateTime.now();
+    }
 }
 

@@ -27,7 +27,20 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    private String paymentReference;
+    private Methods paymentReference;
 
-    private Status status;
+    private StatusPayment statusPayment;
+
+    public Payment(User user, Order order, Methods method) {
+        this.user = user;
+        this.order = order;
+        this.paymentReference = method;
+        this.statusPayment = StatusPayment.SUCCESS;
+    }
+
+    public void update(User user, Order order, Methods method) {
+        this.user = user;
+        this.order = order;
+        this.paymentReference = method;
+    }
 }

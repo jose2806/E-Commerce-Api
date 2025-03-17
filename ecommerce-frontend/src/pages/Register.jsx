@@ -45,7 +45,7 @@ function Register() {
           <input type='password' value={password} onChange={(e) => setPassword(e.target.value)} 
           required autoComplete="current-password" />
         </div>
-        <button type='submit'>Registrarse</button>
+        <button className='register' type='submit'>Registrarse</button>
         <button className="back" onClick={() => navigate("/login")}>Volver al login</button>
       </form>
     </div>

@@ -9,8 +9,10 @@ export const getProducts = async(token) =>{
   return response.data;
 };
 
-export const getProductById = async (id) => {
-  const response = await axios.get(`${API_URL}/products/${id}`);
+export const getProductById = async (id,token) => {
+  const response = await axios.get(`${API_URL}/products/${id}`,{
+    headers:{Authorization: `Bearer ${token}`, "Content-Type":"application/json"}
+  });
   return response.data;  
 };
 

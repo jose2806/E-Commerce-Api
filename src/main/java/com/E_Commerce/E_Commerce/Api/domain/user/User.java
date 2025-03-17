@@ -40,11 +40,11 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> orders;
 
-    public User(@NotBlank String name, @NotBlank String email, String encryptedPassword, @NotNull Role role) {
+    public User(@NotBlank String name, @NotBlank String email, String encryptedPassword, Role role) {
         this.name = name;
         this.email = email;
         this.password = encryptedPassword;
-        this.role = role;
+        this.role =  (role != null) ? role : Role.CLIENT;;
     }
 
 

@@ -10,7 +10,6 @@ public record UserRegisterData(
         String email,
         @NotBlank
         String password,
-        @NotNull
         Role role
 ) {
 }
